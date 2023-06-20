@@ -2167,7 +2167,7 @@ class Canvas_view():
 def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, video_traj_types, ref_pose,
                     output_dir, ref_image, int_mtx, config, image, videos_poses, video_basename, original_H=None, original_W=None,
                     border=None, depth=None, normal_canvas=None, all_canvas=None, mean_loc_depth=None):
-
+    print(f"output_3d_photo with next.Graph")
     cam_mesh = netx.Graph()
     cam_mesh.graph['H'] = Height
     cam_mesh.graph['W'] = Width
@@ -2178,7 +2178,8 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
     cam_mesh.graph['hFov'] = 2 * np.arctan((1. / 2.) * ((cam_mesh.graph['original_W']) / int_mtx_real_x[0]))
     cam_mesh.graph['vFov'] = 2 * np.arctan((1. / 2.) * ((cam_mesh.graph['original_H']) / int_mtx_real_y[1]))
     colors = colors[..., :3]
-
+    
+    print(f"output_3d_photo with reset fov")
     fov_in_rad = max(cam_mesh.graph['vFov'], cam_mesh.graph['hFov'])
     fov = (fov_in_rad * 180 / np.pi)
     print("fov: " + str(fov))
@@ -2233,6 +2234,7 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
     for video_pose, video_traj_type in zip(videos_poses, video_traj_types):
         stereos = []
         tops = []; buttoms = []; lefts = []; rights = []
+        print(f"output_3d_photo with enumerate")
         for tp_id, tp in enumerate(video_pose):
             rel_pose = np.linalg.inv(np.dot(tp, np.linalg.inv(ref_pose)))
             axis, angle = transforms3d.axangles.mat2axangle(rel_pose[0:3, 0:3])
@@ -2269,6 +2271,7 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
                 top, buttom, left, right = find_largest_rect(img, bg_color=(128, 128, 128))
                 tops.append(top); buttoms.append(buttom); lefts.append(left); rights.append(right)
             """
+            print("output_3d_photo stereos.append")
             stereos.append(img[..., :3])
             normal_canvas.translate(-rel_pose[:3,3])
             normal_canvas.rotate(axis=axis, angle=-(angle*180)/np.pi)
@@ -2289,6 +2292,7 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
         clip = ImageSequenceClip(stereos, fps=config['fps'])
         if isinstance(video_basename, list):
             video_basename = video_basename[0]
+        print("output_3d_photo write_videofile ")
         clip.write_videofile(os.path.join(output_dir, video_basename + '_' + video_traj_type + '.mp4'), fps=config['fps'])
 
 
