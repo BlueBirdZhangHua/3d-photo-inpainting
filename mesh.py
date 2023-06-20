@@ -2192,6 +2192,7 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
     else:
         canvas_w = cam_mesh.graph['W']
         canvas_h = cam_mesh.graph['H']
+    print("Step 1")
     canvas_size = max(canvas_h, canvas_w)
     if normal_canvas is None:
         normal_canvas = Canvas_view(fov,
@@ -2205,16 +2206,21 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
     else:
         normal_canvas.reinit_mesh(verts, faces, colors)
         normal_canvas.reinit_camera(fov)
+    print("Step 2")
     img = normal_canvas.render()
     backup_img, backup_all_img, all_img_wo_bound = img.copy(), img.copy() * 0, img.copy() * 0
+    print("Step 3")
     img = cv2.resize(img, (int(img.shape[1] / init_factor), int(img.shape[0] / init_factor)), interpolation=cv2.INTER_AREA)
+    print("Step 4")
     if border is None:
         border = [0, img.shape[0], 0, img.shape[1]]
     H, W = cam_mesh.graph['H'], cam_mesh.graph['W']
+    print("Step 5")
     if (cam_mesh.graph['original_H'] is not None) and (cam_mesh.graph['original_W'] is not None):
         aspect_ratio = cam_mesh.graph['original_H'] / cam_mesh.graph['original_W']
     else:
         aspect_ratio = cam_mesh.graph['H'] / cam_mesh.graph['W']
+    print("Step 6")
     if aspect_ratio > 1:
         img_h_len = cam_mesh.graph['H'] if cam_mesh.graph.get('original_H') is None else cam_mesh.graph['original_H']
         img_w_len = img_h_len / aspect_ratio
@@ -2231,6 +2237,7 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
                   img.shape[1]]
     anchor = np.array(anchor)
     plane_width = np.tan(fov_in_rad/2.) * np.abs(mean_loc_depth)
+    print("Step 7")
     for video_pose, video_traj_type in zip(videos_poses, video_traj_types):
         stereos = []
         tops = []; buttoms = []; lefts = []; rights = []
