@@ -44,8 +44,10 @@ normal_canvas, all_canvas = None, None
 
 if isinstance(config["gpu_ids"], int) and (config["gpu_ids"] >= 0):
     device = config["gpu_ids"]
+    print("Use GPU")
 else:
     device = "cpu"
+    print("Use CPU")
 
 print(f"running on device {device}")
 
@@ -54,18 +56,24 @@ for idx in tqdm(range(len(sample_list))):
     sample = sample_list[idx]
     print("Current Source ==> ", sample['src_pair_name'])
     mesh_fi = os.path.join(config['mesh_folder'], sample['src_pair_name'] +'.ply')
+    print("Image Path:" + sample['ref_img_fi'])
     image = imageio.imread(sample['ref_img_fi'])
+    
 
     print(f"Running depth extraction at {time.time()}")
     if config['use_boostmonodepth'] is True:
+        print("Depth:run_boostmonodepth")
         run_boostmonodepth(sample['ref_img_fi'], config['src_folder'], config['depth_folder'])
     elif config['require_midas'] is True:
+        print("Depth:run_depth")
         run_depth([sample['ref_img_fi']], config['src_folder'], config['depth_folder'],
                   config['MiDaS_model_ckpt'], MonoDepthNet, MiDaS_utils, target_w=640)
 
     if 'npy' in config['depth_format']:
+        print("Depth:run_depth")
         config['output_h'], config['output_w'] = np.load(sample['depth_fi']).shape[:2]
     else:
+        print("Depth:run_depth")
         config['output_h'], config['output_w'] = imageio.imread(sample['depth_fi']).shape[:2]
     frac = config['longer_side_len'] / max(config['output_h'], config['output_w'])
     config['output_h'], config['output_w'] = int(config['output_h'] * frac), int(config['output_w'] * frac)
@@ -77,9 +85,16 @@ for idx in tqdm(range(len(sample_list))):
     else:
         config['gray_image'] = False
     image = cv2.resize(image, (config['output_w'], config['output_h']), interpolation=cv2.INTER_AREA)
+    print("ImageSize w:" + config['output_w'] + "  h:" + config['output_h']);
+
+    startTime = time.time();
+    print("ProcessDepth" + {time.time()});
     depth = read_MiDaS_depth(sample['depth_fi'], 3.0, config['output_h'], config['output_w'])
     mean_loc_depth = depth[depth.shape[0]//2, depth.shape[1]//2]
+    print("DepthCost:" + (time.time() - startTime))
     if not(config['load_ply'] is True and os.path.exists(mesh_fi)):
+        print("Init Models")
+        startTime = time.time()
         vis_photos, vis_depths = sparse_bilateral_filtering(depth.copy(), image.copy(), config, num_iter=config['sparse_iter'], spdb=False)
         depth = vis_depths[-1]
         model = None
@@ -110,7 +125,8 @@ for idx in tqdm(range(len(sample_list))):
         rgb_model = rgb_model.to(device)
         graph = None
 
-
+        print("InitModelCost:" + (time.time() - startTime))
+        startTime = time.time()
         print(f"Writing depth ply (and basically doing everything) at {time.time()}")
         rt_info = write_ply(image,
                               depth,
@@ -121,6 +137,7 @@ for idx in tqdm(range(len(sample_list))):
                               depth_edge_model,
                               depth_edge_model,
                               depth_feat_model)
+        print("finished write_ply " + rt_info)
 
         if rt_info is False:
             continue
@@ -130,10 +147,12 @@ for idx in tqdm(range(len(sample_list))):
         depth_feat_model = None
         torch.cuda.empty_cache()
     if config['save_ply'] is True or config['load_ply'] is True:
+        print("read_ply")
         verts, colors, faces, Height, Width, hFov, vFov = read_ply(mesh_fi)
     else:
+        print("notread_ply")
         verts, colors, faces, Height, Width, hFov, vFov = rt_info
-
+    print(f"Finish infers cost:" + (time.time() - startTime))
 
     print(f"Making video at {time.time()}")
     videos_poses, video_basename = copy.deepcopy(sample['tgts_poses']), sample['tgt_name']
