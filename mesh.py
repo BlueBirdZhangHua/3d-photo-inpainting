@@ -26,20 +26,20 @@ import random
 from functools import reduce
 
 def create_mesh(depth, image, int_mtx, config):
-    print("create_mesh: depth:" + depth + " int_mtx:" + int_mtx + "config:" + config)
+    print(f"create_mesh: depth:{depth} int_mtx:{int_mtx} config:{config}")
     H, W, C = image.shape
     ext_H, ext_W = H + 2 * config['extrapolation_thickness'], W + 2 * config['extrapolation_thickness']
     # Layered Depth Imaging (LDI) https://grail.cs.washington.edu/projects/ldi/
     # https://grail.cs.washington.edu/projects/ldi/ldi.pdf
     LDI = netx.Graph(H=ext_H, W=ext_W, noext_H=H, noext_W=W, cam_param=int_mtx)
-    print("create_mesh: meshSIze H:" + ext_H + " W:" + ext_W)
+    print(f"create_mesh: meshSIze H:{ext_H} w:{ext_W}")
     xy2depth = {}
     int_mtx_pix = int_mtx * np.array([[W], [H], [1.]])
-    print("create_mesh: int_mtx_pix:" + int_mtx_pix)
-    print("create_mesh: np.linalg.inv(int_mtx_pix):" + np.linalg.inv(int_mtx_pix))
+    print(f"create_mesh: int_mtx_pix:{int_mtx_pix}")
+    print(f"create_mesh: np.linalg.inv(int_mtx_pix):{np.linalg.inv(int_mtx_pix)}")
     LDI.graph['cam_param_pix'], LDI.graph['cam_param_pix_inv'] = int_mtx_pix, np.linalg.inv(int_mtx_pix)
     disp = 1. / (-depth)
-    print("create_mesh: disp:" + disp)
+    print(f"create_mesh: disp:{disp}")
     LDI.graph['hoffset'], LDI.graph['woffset'] = config['extrapolation_thickness'], config['extrapolation_thickness']
     LDI.graph['bord_up'], LDI.graph['bord_down'] = LDI.graph['hoffset'] + 0, LDI.graph['hoffset'] + H
     LDI.graph['bord_left'], LDI.graph['bord_right'] = LDI.graph['woffset'] + 0, LDI.graph['woffset'] + W
@@ -116,7 +116,7 @@ def calculate_fov(mesh):
     mesh.graph['hFov'] = 2 * np.arctan(1. / (2*k[0, 0]))
     mesh.graph['vFov'] = 2 * np.arctan(1. / (2*k[1, 1]))
     mesh.graph['aspect'] = mesh.graph['noext_H'] / mesh.graph['noext_W']
-    print("MeshFOV:" + mesh)
+    print(f"MeshFOV:{mesh}")
     return mesh
 
 def calculate_fov_FB(mesh):
@@ -1839,7 +1839,7 @@ def write_ply(image,
     input_mesh, xy2depth, image, depth = create_mesh(depth, image, int_mtx, config)
 
     H, W = input_mesh.graph['H'], input_mesh.graph['W']
-    print("write_ply meshSIze H:" + H + " W:" + W)
+    print(f"write_ply meshSIze H:{H} W:{W}")
     input_mesh = tear_edges(input_mesh, config['depth_threshold'], xy2depth)
     input_mesh, info_on_pix = generate_init_node(input_mesh, config, min_node_in_cc=200)
     edge_ccs, input_mesh, edge_mesh = group_edges(input_mesh, config, image, remove_conflict_ordinal=False)

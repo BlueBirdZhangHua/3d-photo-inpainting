@@ -85,13 +85,13 @@ for idx in tqdm(range(len(sample_list))):
     else:
         config['gray_image'] = False
     image = cv2.resize(image, (config['output_w'], config['output_h']), interpolation=cv2.INTER_AREA)
-    print("ImageSize w:" + config['output_w'] + "  h:" + config['output_h']);
+    print(f"ImageSize w:{config['output_w']}  h:{config['output_h']}")
 
     startTime = time.time();
-    print("ProcessDepth" + {time.time()});
+    print(f"ProcessDepth{time.time()}");
     depth = read_MiDaS_depth(sample['depth_fi'], 3.0, config['output_h'], config['output_w'])
     mean_loc_depth = depth[depth.shape[0]//2, depth.shape[1]//2]
-    print("DepthCost:" + (time.time() - startTime))
+    print(f"DepthCost:" + {(time.time() - startTime)})
     if not(config['load_ply'] is True and os.path.exists(mesh_fi)):
         print("Init Models")
         startTime = time.time()
@@ -125,7 +125,7 @@ for idx in tqdm(range(len(sample_list))):
         rgb_model = rgb_model.to(device)
         graph = None
 
-        print("InitModelCost:" + (time.time() - startTime))
+        print(f"InitModelCost:{(time.time() - startTime)}")
         startTime = time.time()
         print(f"Writing depth ply (and basically doing everything) at {time.time()}")
         rt_info = write_ply(image,
@@ -137,7 +137,7 @@ for idx in tqdm(range(len(sample_list))):
                               depth_edge_model,
                               depth_edge_model,
                               depth_feat_model)
-        print("finished write_ply " + rt_info)
+        print(f"finished write_ply {rt_info}")
 
         if rt_info is False:
             continue
@@ -152,7 +152,7 @@ for idx in tqdm(range(len(sample_list))):
     else:
         print("notread_ply")
         verts, colors, faces, Height, Width, hFov, vFov = rt_info
-    print(f"Finish infers cost:" + (time.time() - startTime))
+    print(f"Finish infers cost:{(time.time() - startTime)}" )
 
     print(f"Making video at {time.time()}")
     videos_poses, video_basename = copy.deepcopy(sample['tgts_poses']), sample['tgt_name']
