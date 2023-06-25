@@ -6,6 +6,7 @@ except ImportError:
     import networkx as netx
 import matplotlib.pyplot as plt
 from functools import partial
+from vispy.geometry import meshdata
 from vispy import scene, io
 from vispy.scene import visuals
 from vispy.visuals.filters import Alpha
@@ -2149,6 +2150,7 @@ class Canvas_view():
         self.mesh.attach(Alpha(1.0))
         self.view.add(self.mesh)
         self.tr = self.view.camera.transform
+        print(f"AddMeshInfo to VISPY\n vertices:{verts}\n faces:{faces} \n vertex_colors:{colors}")
         self.mesh.set_data(vertices=verts, faces=faces, vertex_colors=colors[:, :3])
         self.translate([0,0,0])
         self.rotate(axis=[1,0,0], angle=180)
@@ -2172,6 +2174,12 @@ class Canvas_view():
     def reinit_camera(self, fov):
         self.view.camera.fov = fov
         self.view.camera.view_changed()
+
+def write_3d_obj(modelFilePath, verts, verts_colors, faces):
+    print("write_3d_obj to {modelFilePath}")
+    mesh_data = meshdata.MeshData(vertices=verts, faces=faces, vertex_colors=verts_colors)
+    with open(modelFilePath, "wb") as f:
+        f.write(mesh_data.save())
 
 
 def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, video_traj_types, ref_pose,

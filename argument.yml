@@ -16,6 +16,7 @@ src_folder: image
 depth_folder: depth
 mesh_folder: mesh
 video_folder: video
+3d_model_folder: 3dmodel
 load_ply: False
 save_ply: True
 inference_video: True
@@ -45,3 +46,4 @@ extrapolation_thickness: 60
 repeat_inpaint_edge: True
 crop_border: [0.03, 0.03, 0.05, 0.03]
 anti_flickering: True
+only_export_obj: True
