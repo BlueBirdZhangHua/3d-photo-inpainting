@@ -25,6 +25,7 @@ from mesh_tools import refresh_bord_depth, enlarge_border, fill_dummy_bord, extr
 import transforms3d
 import random
 from functools import reduce
+from numpy import savetxt
 
 def create_mesh(depth, image, int_mtx, config):
     print(f"create_mesh: depth:{depth} int_mtx:{int_mtx} config:{config}")
@@ -2151,6 +2152,9 @@ class Canvas_view():
         self.view.add(self.mesh)
         self.tr = self.view.camera.transform
         print(f"AddMeshInfo to VISPY\n vertices:{verts}\n faces:{faces} \n vertex_colors:{colors}")
+        savetxt('verts.csv', verts, delimiter=',')
+        savetxt('faces.csv', faces, delimiter=',')
+        savetxt('colors.csv', colors[:, :3], delimiter=',')
         self.mesh.set_data(vertices=verts, faces=faces, vertex_colors=colors[:, :3])
         self.translate([0,0,0])
         self.rotate(axis=[1,0,0], angle=180)
