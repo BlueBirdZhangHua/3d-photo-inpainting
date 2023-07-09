@@ -2133,8 +2133,8 @@ def read_ply(mesh_fi):
 
 
 class Canvas_view():
-    def __init__(fName,
-                 self,
+    def __init__(self,
+                 fName,
                  fov,
                  verts,
                  faces,
