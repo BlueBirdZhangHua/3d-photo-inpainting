@@ -91,7 +91,6 @@ for idx in tqdm(range(len(sample_list))):
     startTime = time.time();
     print(f"ProcessDepth{time.time()}");
     depth = read_MiDaS_depth(sample['depth_fi'], 3.0, config['output_h'], config['output_w'])
-    depth = 255 - depth
     mean_loc_depth = depth[depth.shape[0]//2, depth.shape[1]//2]
     print(f"DepthCost:{(time.time() - startTime)}")
     if not(config['load_ply'] is True and os.path.exists(mesh_fi)):
