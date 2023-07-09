@@ -945,6 +945,7 @@ def read_MiDaS_depth(disp_fi, disp_rescale=10., h=None, w=None):
         disp = np.load(disp_fi)
     else:
         disp = imageio.imread(disp_fi).astype(np.float32)
+    disp = 255 - disp
     disp = disp - disp.min()
     disp = cv2.blur(disp / disp.max(), ksize=(3, 3)) * disp.max()
     disp = (disp / disp.max()) * disp_rescale
