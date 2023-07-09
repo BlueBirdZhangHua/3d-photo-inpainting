@@ -2133,7 +2133,8 @@ def read_ply(mesh_fi):
 
 
 class Canvas_view():
-    def __init__(self,
+    def __init__(fName,
+                 self,
                  fov,
                  verts,
                  faces,
@@ -2152,9 +2153,11 @@ class Canvas_view():
         self.view.add(self.mesh)
         self.tr = self.view.camera.transform
         print(f"AddMeshInfo to VISPY\n vertices:{verts}\n faces:{faces} \n vertex_colors:{colors}")
-        savetxt('verts.csv', verts, delimiter=',')
-        savetxt('faces.csv', faces, delimiter=',')
-        savetxt('colors.csv', colors[:, :3], delimiter=',')
+        mkdir("./RawDatas/")
+        savetxt("./RawDatas/" + fName + 'verts.csv', verts, delimiter=',')
+        savetxt("./RawDatas/" + fName + 'faces.csv', faces, delimiter=',')
+        savetxt("./RawDatas/" + fName + 'colors.csv',
+                colors[:, :3], delimiter=',')
         self.mesh.set_data(vertices=verts, faces=faces, vertex_colors=colors[:, :3])
         self.translate([0,0,0])
         self.rotate(axis=[1,0,0], angle=180)
@@ -2217,7 +2220,8 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
     print("Step 1")
     canvas_size = max(canvas_h, canvas_w)
     if normal_canvas is None:
-        normal_canvas = Canvas_view(fov,
+        normal_canvas = Canvas_view(video_basename,
+                                    fov,
                                     verts,
                                     faces,
                                     colors,
@@ -2327,3 +2331,19 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
 
 
     return normal_canvas, all_canvas
+
+
+def mkdir(path):
+    import os
+    path = path.strip()
+    path = path.rstrip("\\")
+    isExists = os.path.exists(path)
+
+    if not isExists:
+        os.makedirs(path)
+
+        print(f"{path}创建成功")
+        return True
+    else:
+        print(f"{path}目录已存在")
+        return False
