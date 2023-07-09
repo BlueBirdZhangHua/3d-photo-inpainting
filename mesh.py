@@ -2154,10 +2154,12 @@ class Canvas_view():
         self.tr = self.view.camera.transform
         print(f"AddMeshInfo to VISPY\n vertices:{verts}\n faces:{faces} \n vertex_colors:{colors}")
         mkdir("./RawDatas/")
-        savetxt("./RawDatas/" + fName + 'verts.csv', verts, delimiter=',')
-        savetxt("./RawDatas/" + fName + 'faces.csv', faces, delimiter=',')
-        savetxt("./RawDatas/" + fName + 'colors.csv',
-                colors[:, :3], delimiter=',')
+        vertsFileName = ['./RawDatas/',fName,'verts.csv']
+        savetxt(vertsFileName, verts, delimiter=',')
+        facesFileName = ['./RawDatas/',fName,'faces.csv']
+        savetxt(facesFileName, faces, delimiter=',')
+        colorsFileName = ['./RawDatas/',fName,'colors.csv']
+        savetxt(colorsFileName, colors[:, :3], delimiter=',')
         self.mesh.set_data(vertices=verts, faces=faces, vertex_colors=colors[:, :3])
         self.translate([0,0,0])
         self.rotate(axis=[1,0,0], angle=180)
