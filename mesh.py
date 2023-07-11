@@ -2148,18 +2148,17 @@ class Canvas_view():
         self.view = self.canvas.central_widget.add_view()
         self.view.camera = 'perspective'
         self.view.camera.fov = fov
+        print(f"Vispy fov: {fov}")
         self.mesh = visuals.Mesh(shading=None)
         self.mesh.attach(Alpha(1.0))
         self.view.add(self.mesh)
         self.tr = self.view.camera.transform
         print(f"AddMeshInfo to VISPY\n vertices:{verts}\n faces:{faces} \n vertex_colors:{colors}")
         mkdir("./RawDatas/")
-        vertsFileName = ['./RawDatas/',fName,'verts.csv']
-        savetxt(vertsFileName, verts, delimiter=',')
-        facesFileName = ['./RawDatas/',fName,'faces.csv']
-        savetxt(facesFileName, faces, delimiter=',')
-        colorsFileName = ['./RawDatas/',fName,'colors.csv']
-        savetxt(colorsFileName, colors[:, :3], delimiter=',')
+        fileNamePref = "./RawDatas/" + fName
+        savetxt(fileNamePref + "verts.csv", verts, delimiter=',')
+        savetxt(fileNamePref + "faces.csv", faces, delimiter=',')
+        savetxt(fileNamePref + "colors.csv", colors[:, :3], delimiter=',')
         self.mesh.set_data(vertices=verts, faces=faces, vertex_colors=colors[:, :3])
         self.translate([0,0,0])
         self.rotate(axis=[1,0,0], angle=180)
@@ -2220,6 +2219,8 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
         canvas_w = cam_mesh.graph['W']
         canvas_h = cam_mesh.graph['H']
     print("Step 1")
+    if isinstance(video_basename, list):
+            video_basename = video_basename[0]
     canvas_size = max(canvas_h, canvas_w)
     if normal_canvas is None:
         normal_canvas = Canvas_view(video_basename,
@@ -2325,8 +2326,6 @@ def output_3d_photo(verts, colors, faces, Height, Width, hFov, vFov, tgt_poses, 
             crop_stereos.append((stereo[atop:abuttom, aleft:aright, :3] * 1).astype(np.uint8))
             stereos = crop_stereos
         clip = ImageSequenceClip(stereos, fps=config['fps'])
-        if isinstance(video_basename, list):
-            video_basename = video_basename[0]
         print("output_3d_photo write_videofile ")
         clip.write_videofile(os.path.join(output_dir, video_basename + '_' + video_traj_type + '.mp4'), fps=config['fps'])
 
